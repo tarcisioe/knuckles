@@ -9,12 +9,12 @@ macro_rules! strong_string {
             }
         }
 
-        impl AsRef<str> for $t {
-            fn as_ref(&self) -> &str {
+        impl Strong<String> for $t {
+            fn get(&self) -> &String {
                 &self.0
             }
         }
-    }
+    };
 }
 
 pub(crate) use strong_string;

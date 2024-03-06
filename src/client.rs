@@ -1,10 +1,10 @@
-use anyhow::{Result, Context};
+use anyhow::Result;
 use reqwest::Url;
 
 use crate::api_types::{AlbumListItem, OuterSubsonicResponse, SubsonicResponse};
-use crate::error::missing_attribute;
+use crate::error::OnMissing;
 use crate::token::TokenInfo;
-use crate::types::{ServerUrl, Username};
+use crate::types::{ServerUrl, Strong, Username};
 
 pub struct SubsonicClient {
     pub url: ServerUrl,
@@ -26,9 +26,9 @@ impl SubsonicClient {
     fn base_url(&self, path: &str) -> Result<Url> {
         let params = [
             ("f", "json"),
-            ("u", self.username.as_ref()),
-            ("t", self.token_info.hash.as_ref()),
-            ("s", self.token_info.salt.as_ref()),
+            ("u", &self.username.get()),
+            ("t", &self.token_info.hash.get()),
+            ("s", &self.token_info.salt.get()),
             ("v", "1.16.1"),
             ("c", "knuckles"),
         ];
@@ -51,10 +51,10 @@ impl SubsonicClient {
             .append_pair("type", "alphabeticalByName");
 
         let albums = subsonic_request(url)?
-                        .album_list.context(missing_attribute("album_list"))?
-                        .album;
+            .album_list
+            .on_missing("album_list")?
+            .album;
 
         Ok(albums)
     }
 }
-
