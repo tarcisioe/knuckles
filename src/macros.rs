@@ -9,6 +9,13 @@ macro_rules! strong_alias {
             }
         }
 
+        impl $n {
+            #[allow(dead_code)]
+            pub fn unchecked(value: impl Into<$t>) -> $n {
+                $n(value.into())
+            }
+        }
+
         impl Strong<$t> for $n {
             fn get(&self) -> &$t {
                 &self.0

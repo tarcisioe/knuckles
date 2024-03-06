@@ -5,7 +5,7 @@ use anyhow::{Context, Result};
 use serde::Deserialize;
 
 use crate::client::SubsonicClient;
-use crate::hash::md5_with_random_salt;
+use crate::hash::default_hasher;
 use crate::token::TokenInfo;
 use crate::types::{Password, ServerUrl, Username};
 
@@ -45,7 +45,7 @@ pub fn make_client(config: &Config) -> SubsonicClient {
     use AuthInfo::*;
 
     let token_info = match &config.client.auth_info {
-        Password(password) => md5_with_random_salt(password),
+        Password(password) => default_hasher().md5_with_random_salt(password),
         Token(token_info) => token_info.clone(),
     };
 
