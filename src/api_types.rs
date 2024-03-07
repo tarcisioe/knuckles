@@ -1,17 +1,19 @@
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
+use crate::types::{AlbumId, ArtistId};
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AlbumListItem {
-    pub id: String,
+    pub id: AlbumId,
     pub is_dir: bool,
     pub song_count: u64,
     pub name: String,
 
     pub album: Option<String>,
     pub artist: Option<String>,
-    pub artist_id: Option<String>,
+    pub artist_id: Option<ArtistId>,
     pub bpm: Option<u64>,
     pub comment: Option<String>,
     pub cover_art: Option<String>,
@@ -30,7 +32,7 @@ pub struct AlbumListItem {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AlbumList {
-    pub album: Vec<AlbumListItem>,
+    pub album: Option<Vec<AlbumListItem>>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -38,7 +38,6 @@ impl<R: Rng> Hasher<R> {
 #[cfg(not(tarpaulin_include))]
 pub fn default_hasher() -> Hasher<ThreadRng> {
     Hasher::new(rand::thread_rng())
-
 }
 
 #[cfg(test)]

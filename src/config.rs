@@ -38,7 +38,7 @@ pub fn make_candidate_config_path(base: &Path) -> PathBuf {
 
 #[cfg(not(tarpaulin_include))]
 pub fn default_config_directory() -> Result<PathBuf> {
-    Ok(dirs::config_dir().context("Could not find a configuration directory for this platform.")?)
+    dirs::config_dir().context("Could not find a configuration directory for this platform.")
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -69,34 +69,38 @@ pub fn make_client<R: Rng>(config: &Config, hasher: &mut Hasher<R>) -> SubsonicC
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use anyhow::Result;
     use rand::SeedableRng;
     use textwrap::dedent;
 
-    use crate::{test_util::test_data_path, types::{PasswordHash, Salt}};
+    use crate::{
+        test_util::test_data_path,
+        types::{PasswordHash, Salt},
+    };
 
     use super::*;
 
     #[test]
     fn test_read_well_formed_config_with_password() -> Result<()> {
-        let config_text = dedent(r#"
+        let config_text = dedent(
+            r#"
             [client]
             url = "dummyurl"
             username = "test"
             password = "password"
-        "#);
+        "#,
+        );
 
         let config = read_config_from_string(&config_text)?;
 
         let expected = Config {
             client: SubsonicConfig {
-               url: ServerUrl::unchecked("dummyurl") ,
-               username: Username::unchecked("test") ,
-               auth_info: AuthInfo::Password(Password::unchecked("password")),
-            }
+                url: ServerUrl::unchecked("dummyurl"),
+                username: Username::unchecked("test"),
+                auth_info: AuthInfo::Password(Password::unchecked("password")),
+            },
         };
 
         assert_eq!(config, expected);
@@ -106,7 +110,8 @@ mod tests {
 
     #[test]
     fn test_read_well_formed_config_with_hash_and_salt() -> Result<()> {
-        let config_text = dedent(r#"
+        let config_text = dedent(
+            r#"
             [client]
             url = "dummyurl"
             username = "test"
@@ -114,19 +119,20 @@ mod tests {
             [client.token]
             hash = "a1b2c3"
             salt = "abcde"
-        "#);
+        "#,
+        );
 
         let config = read_config_from_string(&config_text)?;
 
         let expected = Config {
             client: SubsonicConfig {
-               url: ServerUrl::unchecked("dummyurl") ,
-               username: Username::unchecked("test") ,
-               auth_info: AuthInfo::Token(TokenInfo{
-                   hash: PasswordHash::unchecked("a1b2c3"),
-                   salt: Salt::unchecked("abcde"),
-               }),
-            }
+                url: ServerUrl::unchecked("dummyurl"),
+                username: Username::unchecked("test"),
+                auth_info: AuthInfo::Token(TokenInfo {
+                    hash: PasswordHash::unchecked("a1b2c3"),
+                    salt: Salt::unchecked("abcde"),
+                }),
+            },
         };
 
         assert_eq!(config, expected);
@@ -139,12 +145,14 @@ mod tests {
         let rng = rand::rngs::StdRng::seed_from_u64(10);
         let mut hasher = Hasher::new(rng);
 
-        let config_text = dedent(r#"
+        let config_text = dedent(
+            r#"
             [client]
             url = "dummyurl"
             username = "test"
             password = "password"
-        "#);
+        "#,
+        );
 
         let config = read_config_from_string(&config_text)?;
 
@@ -156,7 +164,7 @@ mod tests {
             token_info: TokenInfo {
                 hash: PasswordHash::unchecked("cc4574efec464ba75cce2c1c36a6e028"),
                 salt: Salt::unchecked("YIVLnWx"),
-            }
+            },
         };
 
         assert_eq!(client, expected);
@@ -169,7 +177,8 @@ mod tests {
         let rng = rand::rngs::StdRng::seed_from_u64(10);
         let mut hasher = Hasher::new(rng);
 
-        let config_text = dedent(r#"
+        let config_text = dedent(
+            r#"
             [client]
             url = "dummyurl"
             username = "test"
@@ -177,7 +186,8 @@ mod tests {
             [client.token]
             hash = "a1b2c3"
             salt = "abcde"
-        "#);
+        "#,
+        );
 
         let config = read_config_from_string(&config_text)?;
 
@@ -189,7 +199,7 @@ mod tests {
             token_info: TokenInfo {
                 hash: PasswordHash::unchecked("a1b2c3"),
                 salt: Salt::unchecked("abcde"),
-            }
+            },
         };
 
         assert_eq!(client, expected);
@@ -199,7 +209,10 @@ mod tests {
 
     #[test]
     fn test_make_candidate_config_path() {
-        assert_eq!(make_candidate_config_path(Path::new("/path/to/configs")), Path::new("/path/to/configs/knuckles.toml"));
+        assert_eq!(
+            make_candidate_config_path(Path::new("/path/to/configs")),
+            Path::new("/path/to/configs/knuckles.toml")
+        );
     }
 
     #[test]
@@ -210,13 +223,13 @@ mod tests {
 
         let expected = Config {
             client: SubsonicConfig {
-               url: ServerUrl::unchecked("dummyurl") ,
-               username: Username::unchecked("test") ,
-               auth_info: AuthInfo::Token(TokenInfo{
-                   hash: PasswordHash::unchecked("a1b2c3"),
-                   salt: Salt::unchecked("abcde"),
-               }),
-            }
+                url: ServerUrl::unchecked("dummyurl"),
+                username: Username::unchecked("test"),
+                auth_info: AuthInfo::Token(TokenInfo {
+                    hash: PasswordHash::unchecked("a1b2c3"),
+                    salt: Salt::unchecked("abcde"),
+                }),
+            },
         };
 
         assert_eq!(config, expected);
@@ -232,10 +245,10 @@ mod tests {
 
         let expected = Config {
             client: SubsonicConfig {
-               url: ServerUrl::unchecked("dummyurl") ,
-               username: Username::unchecked("test") ,
-               auth_info: AuthInfo::Password(Password::unchecked("password")),
-            }
+                url: ServerUrl::unchecked("dummyurl"),
+                username: Username::unchecked("test"),
+                auth_info: AuthInfo::Password(Password::unchecked("password")),
+            },
         };
 
         assert_eq!(config, expected);

@@ -12,7 +12,6 @@ impl<T> OnMissing<T, Infallible> for Option<T> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -32,6 +31,5 @@ mod tests {
             Ok(n) => assert_eq!(n, 42),
             Err(_) => assert!(false),
         }
-
     }
 }

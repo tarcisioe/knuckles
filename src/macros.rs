@@ -33,7 +33,6 @@ macro_rules! strong_alias {
 
 pub(crate) use strong_alias;
 
-
 #[cfg(test)]
 mod tests {
     use core::fmt;
