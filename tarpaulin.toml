@@ -1,0 +1,7 @@
+[base]
+target-dir = "tarpaulin"
+skip-clean = true
+
+[report]
+out = ["Html"]
+output-dir = "tarpaulin/reports"

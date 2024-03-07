@@ -17,7 +17,7 @@ pub struct Hasher<R: Rng> {
 }
 
 impl<R: Rng> Hasher<R> {
-    fn new(rng: R) -> Self {
+    pub fn new(rng: R) -> Self {
         Self { rng }
     }
 
@@ -35,13 +35,14 @@ impl<R: Rng> Hasher<R> {
     }
 }
 
+#[cfg(not(tarpaulin_include))]
 pub fn default_hasher() -> Hasher<ThreadRng> {
     Hasher::new(rand::thread_rng())
+
 }
 
 #[cfg(test)]
 mod tests {
-    use anyhow::Result;
     use rand::SeedableRng;
 
     use crate::types::Strong;
@@ -49,29 +50,25 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_salt_generation() -> Result<()> {
+    fn test_salt_generation() {
         let rng = rand::rngs::StdRng::seed_from_u64(10);
         let mut hasher = Hasher::new(rng);
 
         assert_eq!(hasher.salt().get(), "YIVLnWx");
-
-        Ok(())
     }
 
     #[test]
-    fn test_salted_md5() -> Result<()> {
+    fn test_salted_md5() {
         let hash = salted_md5(
             &Password::unchecked("testpassword"),
             &Salt::unchecked("YIVLnWx"),
         );
 
         assert_eq!(hash.get(), "1b7c28b40f08a05b377fc6a8dda3beea");
-
-        Ok(())
     }
 
     #[test]
-    fn test_md5_with_random_salt() -> Result<()> {
+    fn test_md5_with_random_salt() {
         let rng = rand::rngs::StdRng::seed_from_u64(10);
         let mut hasher = Hasher::new(rng);
 
@@ -79,7 +76,5 @@ mod tests {
 
         assert_eq!(token_info.hash.get(), "1b7c28b40f08a05b377fc6a8dda3beea");
         assert_eq!(token_info.salt.get(), "YIVLnWx");
-
-        Ok(())
     }
 }

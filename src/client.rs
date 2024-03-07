@@ -6,6 +6,7 @@ use crate::error::OnMissing;
 use crate::token::TokenInfo;
 use crate::types::{ServerUrl, Strong, Username};
 
+#[derive(Debug, PartialEq, Eq)]
 pub struct SubsonicClient {
     pub url: ServerUrl,
     pub username: Username,
@@ -26,14 +27,14 @@ impl SubsonicClient {
     fn base_url(&self, path: &str) -> Result<Url> {
         let params = [
             ("f", "json"),
-            ("u", &self.username.get()),
-            ("t", &self.token_info.hash.get()),
-            ("s", &self.token_info.salt.get()),
+            ("u", self.username.get_ref()),
+            ("t", self.token_info.hash.get_ref()),
+            ("s", self.token_info.salt.get_ref()),
             ("v", "1.16.1"),
             ("c", "knuckles"),
         ];
 
-        let mut url = Url::parse_with_params(&self.url.0, &params)?;
+        let mut url = Url::parse_with_params(self.url.get_ref(), &params)?;
 
         url.set_path(&format!("rest/{path}"));
 
@@ -56,5 +57,31 @@ impl SubsonicClient {
             .album;
 
         Ok(albums)
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use crate::types::{PasswordHash, Salt};
+
+    use super::*;
+
+    #[test]
+    fn test_base_url() -> Result<()> {
+        let client = SubsonicClient {
+            url: ServerUrl::unchecked("https://subsonic.example.com"),
+            username: Username::unchecked("user"),
+            token_info: TokenInfo {
+                hash: PasswordHash::unchecked("a1b2c3"),
+                salt: Salt::unchecked("abcde"),
+            }
+        };
+
+        let base_url = client.base_url("ping")?;
+
+        assert_eq!(base_url, Url::parse("https://subsonic.example.com/rest/ping?f=json&u=user&t=a1b2c3&s=abcde&v=1.16.1&c=knuckles")?);
+
+        Ok(())
     }
 }

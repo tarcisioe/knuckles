@@ -1,0 +1,7 @@
+[client]
+url = "dummyurl"
+username = "test"
+
+[client.token]
+hash = "a1b2c3"
+salt = "abcde"

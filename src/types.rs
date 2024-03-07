@@ -3,13 +3,10 @@ use core::fmt;
 use serde::Deserialize;
 
 use crate::macros::strong_alias;
+pub use crate::strong::Strong;
 
-pub trait Strong<T> {
-    fn get(&self) -> &T;
-}
-
-strong_alias!(ServerUrl, String);
-strong_alias!(Username, String);
-strong_alias!(Password, String);
-strong_alias!(PasswordHash, String);
-strong_alias!(Salt, String);
+strong_alias!(ServerUrl, String, Debug, PartialEq, Eq);
+strong_alias!(Username, String, Debug, PartialEq, Eq);
+strong_alias!(Password, String, Debug, PartialEq, Eq);
+strong_alias!(PasswordHash, String, Debug, PartialEq, Eq);
+strong_alias!(Salt, String, Debug, PartialEq, Eq);
