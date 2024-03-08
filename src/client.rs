@@ -72,14 +72,14 @@ impl WriteToUrl for AlbumListType {
     }
 }
 
-fn raw_subsonic_request(url: Url) -> Result<OuterSubsonicResponse> {
-    let json = reqwest::blocking::get(url)?.text()?;
+async fn raw_subsonic_request(url: Url) -> Result<OuterSubsonicResponse> {
+    let json = reqwest::get(url).await?.text().await?;
 
     Ok(serde_json::from_str(&json)?)
 }
 
-fn subsonic_request(url: Url) -> Result<SubsonicResponse> {
-    Ok(raw_subsonic_request(url)?.subsonic_response)
+async fn subsonic_request(url: Url) -> Result<SubsonicResponse> {
+    Ok(raw_subsonic_request(url).await?.subsonic_response)
 }
 
 impl SubsonicClient {
@@ -100,11 +100,11 @@ impl SubsonicClient {
         Ok(url)
     }
 
-    pub fn ping(&self) -> Result<SubsonicResponse> {
-        subsonic_request(self.base_url("ping")?)
+    pub async fn ping(&self) -> Result<SubsonicResponse> {
+        subsonic_request(self.base_url("ping")?).await
     }
 
-    pub fn albums(
+    pub async fn albums(
         &self,
         list_type: AlbumListType,
         size: Option<u64>,
@@ -130,7 +130,7 @@ impl SubsonicClient {
             qp.append_pair("offset", &music_folder_id.get());
         }
 
-        let albums = subsonic_request(url)?
+        let albums = subsonic_request(url).await?
             .album_list
             .on_missing("album_list")?
             .album
@@ -139,12 +139,12 @@ impl SubsonicClient {
         Ok(albums)
     }
 
-    pub fn album(&self, id: &AlbumId) -> Result<AlbumID3WithSongs> {
+    pub async fn album(&self, id: &AlbumId) -> Result<AlbumID3WithSongs> {
         let mut url = self.base_url("getAlbum")?;
 
         url.query_pairs_mut().append_pair("id", id.get_ref());
 
-        let albums = subsonic_request(url)?.album.on_missing("album")?;
+        let albums = subsonic_request(url).await?.album.on_missing("album")?;
 
         Ok(albums)
     }

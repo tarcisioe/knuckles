@@ -6,8 +6,8 @@ use crate::types::{AlbumId, ArtistId, SongId};
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ReplayGain {
-    pub album_peak: f64,
-    pub track_peak: f64,
+    pub album_peak: Option<f64>,
+    pub track_peak: Option<f64>,
 }
 
 #[derive(Debug, Deserialize)]
