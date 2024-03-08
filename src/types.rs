@@ -14,3 +14,4 @@ strong_alias!(Salt, String, Debug, PartialEq, Eq);
 strong_alias!(AlbumId, String, Debug, PartialEq, Eq);
 strong_alias!(ArtistId, String, Debug, PartialEq, Eq);
 strong_alias!(MusicFolderId, String, Debug, PartialEq, Eq);
+strong_alias!(SongId, String, Debug, PartialEq, Eq);

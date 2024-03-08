@@ -3,10 +3,10 @@ use core::fmt;
 use anyhow::Result;
 use reqwest::Url;
 
-use crate::api_types::{AlbumListItem, OuterSubsonicResponse, SubsonicResponse};
+use crate::api_types::{AlbumID3WithSongs, AlbumListItem, OuterSubsonicResponse, SubsonicResponse};
 use crate::error::OnMissing;
 use crate::token::TokenInfo;
-use crate::types::{MusicFolderId, ServerUrl, Strong, Username};
+use crate::types::{AlbumId, MusicFolderId, ServerUrl, Strong, Username};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct SubsonicClient {
@@ -135,6 +135,16 @@ impl SubsonicClient {
             .on_missing("album_list")?
             .album
             .unwrap_or_else(Vec::new);
+
+        Ok(albums)
+    }
+
+    pub fn album(&self, id: &AlbumId) -> Result<AlbumID3WithSongs> {
+        let mut url = self.base_url("getAlbum")?;
+
+        url.query_pairs_mut().append_pair("id", id.get_ref());
+
+        let albums = subsonic_request(url)?.album.on_missing("album")?;
 
         Ok(albums)
     }
