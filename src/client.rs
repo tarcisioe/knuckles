@@ -6,7 +6,7 @@ use reqwest::Url;
 use crate::api_types::{AlbumID3WithSongs, AlbumListItem, OuterSubsonicResponse, SubsonicResponse};
 use crate::error::OnMissing;
 use crate::token::TokenInfo;
-use crate::types::{AlbumId, MusicFolderId, ServerUrl, Strong, Username};
+use crate::types::{AlbumId, MusicFolderId, ServerUrl, SongId, Strong, Username};
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct SubsonicClient {
@@ -130,7 +130,8 @@ impl SubsonicClient {
             qp.append_pair("offset", &music_folder_id.get());
         }
 
-        let albums = subsonic_request(url).await?
+        let albums = subsonic_request(url)
+            .await?
             .album_list
             .on_missing("album_list")?
             .album
@@ -147,6 +148,14 @@ impl SubsonicClient {
         let albums = subsonic_request(url).await?.album.on_missing("album")?;
 
         Ok(albums)
+    }
+
+    pub async fn stream(&self, id: &SongId) -> Result<reqwest::Response> {
+        let mut url = self.base_url("stream")?;
+
+        url.query_pairs_mut().append_pair("id", id.get_ref());
+
+        Ok(reqwest::get(url).await?)
     }
 }
 
