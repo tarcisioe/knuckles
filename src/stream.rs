@@ -33,10 +33,13 @@ pub struct SongStream<R: Read> {
 }
 
 impl<R: Read> SongStream<R> {
-    pub fn new(stream: R) -> SongStream<R> {
+    pub fn new(stream: R, expected: Option<usize>) -> SongStream<R> {
         SongStream {
             stream,
-            loaded: Vec::new(),
+            loaded: match expected {
+                Some(expected) => Vec::with_capacity(expected),
+                None => Vec::new(),
+            },
             index: 0,
         }
     }
@@ -106,6 +109,11 @@ impl<R: Read> Seek for SongStream<R> {
 }
 
 pub fn from_response(response: reqwest::Response) -> SongStream<SyncReader> {
+    let expected = response
+        .headers()
+        .get("Content-Length")
+        .and_then(|v| v.to_str().ok().and_then(|v| v.parse().ok()));
+
     let s = response
         .bytes_stream()
         .fuse()
@@ -114,5 +122,5 @@ pub fn from_response(response: reqwest::Response) -> SongStream<SyncReader> {
 
     let sync_reader = SyncReader::new(s, Handle::current());
 
-    SongStream::new(sync_reader)
+    SongStream::new(sync_reader, expected)
 }

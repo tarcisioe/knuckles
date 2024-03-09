@@ -127,7 +127,7 @@ impl SubsonicClient {
 
         if let Some(music_folder_id) = music_folder_id {
             let mut qp = url.query_pairs_mut();
-            qp.append_pair("offset", &music_folder_id.get());
+            qp.append_pair("music_folder_id", &music_folder_id.get());
         }
 
         let albums = subsonic_request(url)
@@ -150,10 +150,22 @@ impl SubsonicClient {
         Ok(albums)
     }
 
-    pub async fn stream(&self, id: &SongId) -> Result<reqwest::Response> {
+    pub async fn stream(
+        &self,
+        id: &SongId,
+        estimate_content_length: Option<bool>,
+    ) -> Result<reqwest::Response> {
         let mut url = self.base_url("stream")?;
 
         url.query_pairs_mut().append_pair("id", id.get_ref());
+
+        if let Some(estimate_content_length) = estimate_content_length {
+            let mut qp = url.query_pairs_mut();
+            qp.append_pair(
+                "estimateContentLength",
+                &estimate_content_length.to_string(),
+            );
+        }
 
         Ok(reqwest::get(url).await?)
     }

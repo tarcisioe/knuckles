@@ -15,38 +15,14 @@ mod test_util;
 mod token;
 mod types;
 
+use client::AlbumListType;
 use hash::default_hasher;
+use stream::{SongStream, SyncReader};
 
-use crate::{
-    config::{default_config_file_path, make_client, read_config_from_path},
-    types::SongId,
-};
+use crate::config::{default_config_file_path, make_client, read_config_from_path};
 
-#[tokio::main]
-async fn main() -> Result<()> {
-    let config_path = default_config_file_path()?;
-    let config = read_config_from_path(&config_path)?;
-    let client = make_client(&config, &mut default_hasher());
-
-    /*
-    dbg!(client.ping().await?);
-
-    let r = client.albums(AlbumListType::AlphabeticalByName, None, None, None).await?;
-
-    dbg!(r);
-
-    let r = client.album(&AlbumId::unchecked("69b7b8e47762e9a9fdc6ac558003ca49")).await?;
-
-    dbg!(r);
-    */
-
-    let r = client
-        .stream(&SongId::unchecked("8ff72dd73e11810de0675cba67cf4a4f"))
-        .await?;
-
-    let song_stream = stream::from_response(r);
-
-    let buffered = BufReader::new(song_stream);
+fn play_stream(s: SongStream<SyncReader>) -> Result<()> {
+    let buffered = BufReader::new(s);
 
     let decoder = tokio::task::block_in_place(|| rodio::decoder::Decoder::new(buffered))?;
 
@@ -59,4 +35,23 @@ async fn main() -> Result<()> {
     sink.sleep_until_end();
 
     Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    let config_path = default_config_file_path()?;
+    let config = read_config_from_path(&config_path)?;
+    let client = make_client(&config, &mut default_hasher());
+
+    dbg!(client.ping().await?);
+
+    let albums = client
+        .albums(AlbumListType::AlphabeticalByName, None, None, None)
+        .await?;
+    let first_album = client.album(&albums[0].id).await?;
+    let first_song = client.stream(&first_album.song[0].id, Some(true)).await?;
+
+    let song_stream = stream::from_response(first_song);
+
+    play_stream(song_stream)
 }
