@@ -71,6 +71,12 @@ pub struct AlbumID3 {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct Genre {
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Song {
     pub id: SongId,
 
@@ -91,7 +97,7 @@ pub struct Song {
     pub created: Option<DateTime<Utc>>,
     pub disc_number: Option<u64>,
     pub duration: Option<u64>,
-    pub genres: Option<Vec<String>>,
+    pub genres: Option<Vec<Genre>>,
     pub is_video: Option<bool>,
     pub parent: Option<String>,
     pub path: Option<String>,
