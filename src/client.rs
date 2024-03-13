@@ -3,7 +3,7 @@ use core::fmt;
 use anyhow::Result;
 use reqwest::Url;
 
-use crate::api_types::{AlbumID3WithSongs, AlbumListItem, OuterSubsonicResponse, SubsonicResponse};
+use crate::api_types::{AlbumID3WithSongs, AlbumListItem, OuterSubsonicResponse, ScanStatus, SubsonicResponse};
 use crate::error::OnMissing;
 use crate::token::TokenInfo;
 use crate::types::{AlbumId, MusicFolderId, ServerUrl, SongId, Strong, Username};
@@ -148,6 +148,22 @@ impl SubsonicClient {
         let albums = subsonic_request(url).await?.album.on_missing("album")?;
 
         Ok(albums)
+    }
+
+    pub async fn start_scan(&self) -> Result<ScanStatus> {
+        let url = self.base_url("startScan")?;
+
+        let scan_status = subsonic_request(url).await?.scan_status.on_missing("scan_status")?;
+
+        Ok(scan_status)
+    }
+
+    pub async fn get_scan_status(&self) -> Result<ScanStatus> {
+        let url = self.base_url("getScanStatus")?;
+
+        let scan_status = subsonic_request(url).await?.scan_status.on_missing("scan_status")?;
+
+        Ok(scan_status)
     }
 
     pub async fn stream(

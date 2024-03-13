@@ -117,6 +117,13 @@ pub struct AlbumID3WithSongs {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct ScanStatus {
+    pub scanning: bool,
+    pub count: i64,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SubsonicResponse {
     // Required fields
     pub open_subsonic: bool,
@@ -127,6 +134,7 @@ pub struct SubsonicResponse {
     // Optional fields
     pub album: Option<AlbumID3WithSongs>,
     pub album_list: Option<AlbumList>,
+    pub scan_status: Option<ScanStatus>,
 
     // Renamed fields
     #[serde(rename = "type")]
